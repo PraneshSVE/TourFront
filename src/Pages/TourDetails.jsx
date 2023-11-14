@@ -38,6 +38,9 @@ const TourDetails = () => {
         rating: tourRating,
       };
 
+      console.log('User:', user);
+      console.log('Credentials:', document.cookie); // Or your authentication method
+
       const apiUrl = `${BASE_URL}/review/${id}`;
       console.log('API URL:', apiUrl);
 
@@ -49,6 +52,7 @@ const TourDetails = () => {
         credentials: 'include',
         body: JSON.stringify(reviewObj),
       });
+
       const result = await res.json();
       if (!res.ok) {
         return alert(result.message);
@@ -78,7 +82,7 @@ const TourDetails = () => {
                   <div className='saturate-200'>
                     <img src={photo} alt='' />
                   </div>
-                  <div className='tour__info'>
+                  <div className='tour__info'>                   
                   <h2>{title}</h2>
                     <div className="d-flex align-items-center gap-5">
                       <span className='tour__rating d-flex align-items-center gap-1'>
@@ -102,6 +106,7 @@ const TourDetails = () => {
                     <h5 className='teal'>Description</h5>
                     <p>{desc}</p>
                   </div>
+
                   <div className='tour__reviews mt-4'>
                     <h4>Reviews ({reviews?.length} reviews)</h4>
                     <Form onSubmit={submitHandler}>
