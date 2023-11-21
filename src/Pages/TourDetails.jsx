@@ -16,14 +16,13 @@ const TourDetails = () => {
   const [tourRating, settourRating] = useState(null);
   const { user } = useContext(AuthContext);
 
-  //fetch data from the database
+  // Fetch data from the database
   const { data: tour, loading, error } = useFetch(`${BASE_URL}/tours/${id}`);
-
-  const { photo, title, desc, price, reviews, city, distance, address, maxGroupSize } = tour;
+  const { photo, title, desc, price, reviews, city, distance, address, maxGroupSize, value } = tour;
   const { totalRating, avgRating } = calculateAvgRating(reviews);
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
 
-  //submit request to the server
+  // Submit request to the server
   const submitHandler = async (e) => {
     e.preventDefault();
     const reviewText = reviewMsgRef.current.value;
@@ -31,37 +30,37 @@ const TourDetails = () => {
     try {
       if (!user || user === undefined || user === null) {
         alert('Please sign in');
+        return;
       }
+
       const reviewObj = {
         username: user?.username,
         reviewText,
         rating: tourRating,
       };
 
-      console.log('User:', user);
-      console.log('Credentials:', document.cookie); // Or your authentication method
-
-      const apiUrl = `${BASE_URL}/review/${id}`;
-      console.log('API URL:', apiUrl);
-
-      const res = await fetch(apiUrl, {
+      const res = await fetch(`${BASE_URL}/review/${id}`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json',
+          'Content-Type': 'application/json', // Make sure the header is correctly spelled
         },
         credentials: 'include',
         body: JSON.stringify(reviewObj),
       });
 
-      const result = await res.json();
+      // Check for errors in the response status
       if (!res.ok) {
-        return alert(result.message);
-      } else {
+        const result = await res.json();
         alert(result.message);
-        window.location.reload();
+        return;
       }
+
+      const result = await res.json();
+      alert(result.message);
+      window.location.reload();
     } catch (err) {
-      alert(err.message);
+      alert('An error occurred while processing your request. Please try again later.');
+      console.error(err);
     }
   };
 
@@ -69,21 +68,21 @@ const TourDetails = () => {
     window.scrollTo(0, 0);
   }, [tour]);
 
-  return (
+ return (
     <>
       <section>
         <Container>
           {loading && <h4 className='text-center pt-5'>Loading......</h4>}
           {error && <h4 className='text-center pt-5'>{error}</h4>}
-          {!loading && !error && (
-            <Row>
+          {
+            !loading && !error && <Row>
               <Col lg='8'>
-                <div className='tour__content'>
-                  <div className='saturate-200'>
-                    <img src={photo} alt='' />
+                <div className="tour__content">
+                  <div className="saturate-200">
+                    <img src={photo} alt="" />
                   </div>
-                  <div className='tour__info'>                   
-                  <h2>{title}</h2>
+                  <div className="tour__info">
+                    <h2>{title}</h2>
                     <div className="d-flex align-items-center gap-5">
                       <span className='tour__rating d-flex align-items-center gap-1'>
                         <i class="ri-star-s-fill" style={{ color: 'var(--secondary-color)' }}
@@ -107,6 +106,7 @@ const TourDetails = () => {
                     <p>{desc}</p>
                   </div>
 
+                  {/*==============tour reviews section =================*/}
                   <div className='tour__reviews mt-4'>
                     <h4>Reviews ({reviews?.length} reviews)</h4>
                     <Form onSubmit={submitHandler}>
@@ -151,18 +151,19 @@ const TourDetails = () => {
                       }
                     </ListGroup>
                   </div>
+                  {/*==============tour reviews section end =================*/}
                 </div>
               </Col>
               <Col lg='4'>
                 <Booking tour={tour} avgRating={avgRating} />
               </Col>
             </Row>
-          )}
+          }
         </Container>
       </section>
       <Newsletter />
     </>
-  );
-};
+  )
+}
 
-export default TourDetails;
+export default TourDetails
