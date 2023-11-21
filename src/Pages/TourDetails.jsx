@@ -39,7 +39,7 @@ const TourDetails = () => {
         rating: tourRating,
       };
 
-      const res = await fetch(`${BASE_URL}/review/${id}`, {
+      const res = await fetch(`https://tourback.onrender.com/review/${id}`, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json', // Make sure the header is correctly spelled
